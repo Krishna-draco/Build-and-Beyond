@@ -47,9 +47,14 @@ const ChatModal = ({
           socketRef.current = null;
         }
 
-        socketRef.current = io("http://localhost:3000", {
-          withCredentials: true,
-        });
+        socketRef.current = io(
+          window.__APP_API_BASE_URL__ ||
+            import.meta.env.VITE_API_BASE_URL ||
+            "http://localhost:3000",
+          {
+            withCredentials: true,
+          },
+        );
 
         const handleMessage = (messageData) => {
           setMessages((prev) => [...prev, messageData]);
