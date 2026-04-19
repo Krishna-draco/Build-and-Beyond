@@ -19,16 +19,19 @@ const NotFound = () => {
 
   useEffect(() => {
     // Log 404 error to backend
-    fetch("http://localhost:3000/api/log-client-error", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        message: "Page not found",
-        status: 404,
-        url: location.pathname,
-        userAgent: navigator.userAgent,
-      }),
-    }).catch((err) => console.error("Failed to log error:", err));
+    fetch(
+      `${window.__APP_API_BASE_URL__ || import.meta.env.VITE_API_BASE_URL || "http://localhost:3000"}/api/log-client-error`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: "Page not found",
+          status: 404,
+          url: location.pathname,
+          userAgent: navigator.userAgent,
+        }),
+      },
+    ).catch((err) => console.error("Failed to log error:", err));
   }, [location.pathname]);
 
   return (

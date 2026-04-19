@@ -1,20 +1,20 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import io from 'socket.io-client';
-import './CompanyChat.css';
+import React, { useState, useEffect, useRef } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import io from "socket.io-client";
+import "./CompanyChat.css";
 
 const CompanyChat = () => {
   const { roomId } = useParams();
   const navigate = useNavigate();
   const [messages, setMessages] = useState([]);
-  const [newMessage, setNewMessage] = useState('');
+  const [newMessage, setNewMessage] = useState("");
   const [chatData, setChatData] = useState(null);
   const [loading, setLoading] = useState(true);
   const socketRef = useRef(null);
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   useEffect(() => {
@@ -25,15 +25,15 @@ const CompanyChat = () => {
     const fetchChatData = async () => {
       try {
         const response = await fetch(`/api/chat/${roomId}`, {
-          credentials: 'include',
+          credentials: "include",
         });
-        if (!response.ok) throw new Error('Failed to load chat');
+        if (!response.ok) throw new Error("Failed to load chat");
         const data = await response.json();
         setChatData(data);
         setMessages(data.messages || []);
         initializeSocket(data);
       } catch (error) {
-        console.error('Error loading chat:', error);
+        console.error("Error loading chat:", error);
       } finally {
         setLoading(false);
       }
@@ -50,26 +50,31 @@ const CompanyChat = () => {
 
   const initializeSocket = (data) => {
     const userId = data.userId;
-    const userRole = data.userRole || 'company';
+    const userRole = data.userRole || "company";
 
-    socketRef.current = io('http://localhost:3000', {
-      withCredentials: true,
-    });
+    socketRef.current = io(
+      window.__APP_API_BASE_URL__ ||
+        import.meta.env.VITE_API_BASE_URL ||
+        "http://localhost:3000",
+      {
+        withCredentials: true,
+      },
+    );
 
-    socketRef.current.emit('joinRoom', {
+    socketRef.current.emit("joinRoom", {
       roomId,
       userId,
       userRole,
     });
 
-    socketRef.current.on('message', (messageData) => {
+    socketRef.current.on("message", (messageData) => {
       setMessages((prev) => [...prev, messageData]);
     });
 
-    socketRef.current.on('userStatus', ({ userId: statusUserId, status }) => {
+    socketRef.current.on("userStatus", ({ userId: statusUserId, status }) => {
       setChatData((prev) => ({
         ...prev,
-        otherUserOnline: status === 'online',
+        otherUserOnline: status === "online",
       }));
     });
   };
@@ -79,23 +84,24 @@ const CompanyChat = () => {
     if (!newMessage.trim() || !socketRef.current) return;
 
     const senderId = chatData.userId;
-    const senderModel = chatData.userRole.charAt(0).toUpperCase() + chatData.userRole.slice(1);
+    const senderModel =
+      chatData.userRole.charAt(0).toUpperCase() + chatData.userRole.slice(1);
 
-    socketRef.current.emit('chatMessage', {
+    socketRef.current.emit("chatMessage", {
       roomId,
       senderId,
       senderModel,
       message: newMessage.trim(),
     });
 
-    setNewMessage('');
+    setNewMessage("");
   };
 
   if (loading) {
     return <div className="compchat-loading">Loading chat...</div>;
   }
 
-  const otherUserName = chatData?.otherUserName || 'User';
+  const otherUserName = chatData?.otherUserName || "User";
 
   return (
     <div className="compchat-container">
@@ -105,8 +111,10 @@ const CompanyChat = () => {
         </button>
         <div className="compchat-user-info">
           <h2>{otherUserName}</h2>
-          <span className={`compchat-status ${chatData?.otherUserOnline ? 'online' : 'offline'}`}>
-            {chatData?.otherUserOnline ? 'Online' : 'Offline'}
+          <span
+            className={`compchat-status ${chatData?.otherUserOnline ? "online" : "offline"}`}
+          >
+            {chatData?.otherUserOnline ? "Online" : "Offline"}
           </span>
         </div>
       </div>
@@ -117,15 +125,15 @@ const CompanyChat = () => {
             key={index}
             className={`compchat-message ${
               msg.sender?.toString() === chatData.userId?.toString()
-                ? 'sent'
-                : 'received'
+                ? "sent"
+                : "received"
             }`}
           >
             <div className="compchat-message-content">{msg.message}</div>
             <div className="compchat-message-time">
               {new Date(msg.timestamp).toLocaleTimeString([], {
-                hour: '2-digit',
-                minute: '2-digit',
+                hour: "2-digit",
+                minute: "2-digit",
               })}
             </div>
           </div>

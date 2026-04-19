@@ -1,13 +1,13 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import io from 'socket.io-client';
-import './Chat.css';
+import React, { useState, useEffect, useRef } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import io from "socket.io-client";
+import "./Chat.css";
 
 const Chat = () => {
   const { roomId } = useParams();
   const navigate = useNavigate();
   const [messages, setMessages] = useState([]);
-  const [newMessage, setNewMessage] = useState('');
+  const [newMessage, setNewMessage] = useState("");
   const [chatData, setChatData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [onlineUsers, setOnlineUsers] = useState(new Set());
@@ -30,7 +30,7 @@ const Chat = () => {
   const fetchChatData = async () => {
     try {
       const response = await fetch(`/api/chat/${roomId}`, {
-        credentials: 'include'
+        credentials: "include",
       });
 
       if (response.ok) {
@@ -39,12 +39,12 @@ const Chat = () => {
         setMessages(data.messages || []);
         initializeSocket(data);
       } else {
-        alert('Failed to load chat');
+        alert("Failed to load chat");
         navigate(-1);
       }
     } catch (error) {
-      console.error('Error fetching chat:', error);
-      alert('Error loading chat');
+      console.error("Error fetching chat:", error);
+      alert("Error loading chat");
       navigate(-1);
     } finally {
       setLoading(false);
@@ -52,24 +52,29 @@ const Chat = () => {
   };
 
   const initializeSocket = (data) => {
-    socketRef.current = io('http://localhost:3000', {
-      withCredentials: true
-    });
+    socketRef.current = io(
+      window.__APP_API_BASE_URL__ ||
+        import.meta.env.VITE_API_BASE_URL ||
+        "http://localhost:3000",
+      {
+        withCredentials: true,
+      },
+    );
 
-    socketRef.current.emit('joinRoom', {
+    socketRef.current.emit("joinRoom", {
       roomId: data.roomId,
       userId: data.userId,
-      userRole: data.userRole
+      userRole: data.userRole,
     });
 
-    socketRef.current.on('message', (messageData) => {
-      setMessages(prev => [...prev, messageData]);
+    socketRef.current.on("message", (messageData) => {
+      setMessages((prev) => [...prev, messageData]);
     });
 
-    socketRef.current.on('userStatus', ({ userId, status }) => {
-      setOnlineUsers(prev => {
+    socketRef.current.on("userStatus", ({ userId, status }) => {
+      setOnlineUsers((prev) => {
         const newSet = new Set(prev);
-        if (status === 'online') {
+        if (status === "online") {
           newSet.add(userId);
         } else {
           newSet.delete(userId);
@@ -83,18 +88,19 @@ const Chat = () => {
     e.preventDefault();
     if (!newMessage.trim() || !socketRef.current) return;
 
-    socketRef.current.emit('chatMessage', {
+    socketRef.current.emit("chatMessage", {
       roomId: chatData.roomId,
       senderId: chatData.userId,
-      senderModel: chatData.userRole.charAt(0).toUpperCase() + chatData.userRole.slice(1),
-      message: newMessage.trim()
+      senderModel:
+        chatData.userRole.charAt(0).toUpperCase() + chatData.userRole.slice(1),
+      message: newMessage.trim(),
     });
 
-    setNewMessage('');
+    setNewMessage("");
   };
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   if (loading) {
@@ -123,9 +129,13 @@ const Chat = () => {
           <h2>{chatData.otherUserName}</h2>
           <span className="chat-status">
             {onlineUsers.has(chatData.userId) ? (
-              <><i className="fas fa-circle online"></i> Online</>
+              <>
+                <i className="fas fa-circle online"></i> Online
+              </>
             ) : (
-              <><i className="fas fa-circle offline"></i> Offline</>
+              <>
+                <i className="fas fa-circle offline"></i> Offline
+              </>
             )}
           </span>
         </div>
@@ -141,12 +151,15 @@ const Chat = () => {
           messages.map((msg, index) => (
             <div
               key={index}
-              className={`chat-message ${msg.sender?.toString() === chatData.userId?.toString() ? 'sent' : 'received'}`}
+              className={`chat-message ${msg.sender?.toString() === chatData.userId?.toString() ? "sent" : "received"}`}
             >
               <div className="message-content">
                 <p>{msg.message}</p>
                 <span className="message-time">
-                  {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  {new Date(msg.timestamp).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
                 </span>
               </div>
             </div>
@@ -163,7 +176,11 @@ const Chat = () => {
           placeholder="Type a message..."
           className="chat-input"
         />
-        <button type="submit" className="chat-send-btn" disabled={!newMessage.trim()}>
+        <button
+          type="submit"
+          className="chat-send-btn"
+          disabled={!newMessage.trim()}
+        >
           <i className="fas fa-paper-plane"></i>
         </button>
       </form>

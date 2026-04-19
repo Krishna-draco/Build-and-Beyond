@@ -1076,7 +1076,7 @@ const CustomerOngoing = () => {
                                       }
                                       onClick={() =>
                                         window.open(
-                                          `http://localhost:3000/${img}`,
+                                          `${window.__APP_API_BASE_URL__ || import.meta.env.VITE_API_BASE_URL || "http://localhost:3000"}/${img}`,
                                           "_blank",
                                         )
                                       }
