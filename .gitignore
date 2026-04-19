@@ -29,5 +29,8 @@ Thumbs.db
 *.log
 npm-debug.log*
 
+# Test coverage outputs
+backend/coverage/
+
 # Uploads (if you want to exclude uploaded files)
 backend/uploads/

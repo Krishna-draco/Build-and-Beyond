@@ -77,6 +77,14 @@ app.get("/", (req, res) => {
   res.status(200).json({ view: "landing_page" });
 });
 
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: "ok",
+    service: "build-and-beyond-backend",
+    timestamp: new Date().toISOString(),
+  });
+});
+
 app.get("/signin_up", (req, res) => {
   res.status(200).json({ view: "signin_up_" });
 });

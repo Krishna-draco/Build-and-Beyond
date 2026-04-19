@@ -270,7 +270,8 @@
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest --runInBand",
+    "test:ci": "jest --coverage --runInBand",
     "sync:indexes": "node scripts/sync-indexes.js",
     "sync:indexes:dry-run": "node scripts/sync-indexes.js --dry-run",
     "sync:indexes:full": "node scripts/sync-indexes.js --full-sync",
@@ -282,6 +283,10 @@
     "perf:query-planning": "node scripts/query-planning/top-query-explain.js",
     "perf:query-planning:heavy": "node scripts/query-planning/top-query-explain.js --profile heavy",
     "perf:query-planning:compare": "node scripts/query-planning/compare-query-planning.js"
+  },
+  "devDependencies": {
+    "jest": "^30.2.0",
+    "supertest": "^7.1.4"
   },
   "keywords": [],
   "author": "",
