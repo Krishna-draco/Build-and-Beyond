@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "https://build-and-beyond-backend.onrender.com/api/$1"
+    }
+  ]
+}
