@@ -31,11 +31,17 @@ const CompanyBids = () => {
     const success = searchParams.get("success");
     const error = searchParams.get("error");
     if (success === "bid_submitted") {
-      setAlert({ type: "success", msg: "Your bid has been submitted successfully!" });
+      setAlert({
+        type: "success",
+        msg: "Your bid has been submitted successfully!",
+      });
     } else if (error === "invalid_data") {
       setAlert({ type: "danger", msg: "Please provide a valid bid amount." });
     } else if (error === "server_error") {
-      setAlert({ type: "danger", msg: "An error occurred while processing your bid. Please try again." });
+      setAlert({
+        type: "danger",
+        msg: "An error occurred while processing your bid. Please try again.",
+      });
     }
 
     if (success || error) {
@@ -53,9 +59,12 @@ const CompanyBids = () => {
     const load = async () => {
       setLoading(true);
       try {
-        const res = await fetch("http://localhost:3000/api/companybids", {
-          credentials: "include",
-        });
+        const res = await fetch(
+          `${window.__APP_API_BASE_URL__ || import.meta.env.VITE_API_BASE_URL || "http://localhost:3000"}/api/companybids`,
+          {
+            credentials: "include",
+          },
+        );
 
         if (!res.ok) throw new Error("Failed to fetch bids");
 
@@ -76,7 +85,10 @@ const CompanyBids = () => {
         }
       } catch (e) {
         console.error("Error loading bids:", e);
-        setAlert({ type: "danger", msg: "Failed to load bids. Please try again." });
+        setAlert({
+          type: "danger",
+          msg: "Failed to load bids. Please try again.",
+        });
       } finally {
         setLoading(false);
       }
@@ -114,7 +126,10 @@ const CompanyBids = () => {
 
     const amount = parseFloat(bidAmount);
     if (isNaN(amount) || amount <= 0) {
-      setAlert({ type: "danger", msg: "Please enter a valid bid amount greater than zero." });
+      setAlert({
+        type: "danger",
+        msg: "Please enter a valid bid amount greater than zero.",
+      });
       return;
     }
 
@@ -127,17 +142,20 @@ const CompanyBids = () => {
     }
 
     try {
-      const res = await fetch("http://localhost:3000/api/submit-bid", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
-          bidId: selectedBid._id,
-          bidPrice: amount,
-          companyName,
-          companyId,
-        }),
-      });
+      const res = await fetch(
+        `${window.__APP_API_BASE_URL__ || import.meta.env.VITE_API_BASE_URL || "http://localhost:3000"}/api/submit-bid`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({
+            bidId: selectedBid._id,
+            bidPrice: amount,
+            companyName,
+            companyId,
+          }),
+        },
+      );
 
       const data = await res.json();
       if (res.ok) {
@@ -145,7 +163,10 @@ const CompanyBids = () => {
         setBidAmount("");
         window.location.reload();
       } else {
-        setAlert({ type: "danger", msg: data.error || "Failed to submit bid." });
+        setAlert({
+          type: "danger",
+          msg: data.error || "Failed to submit bid.",
+        });
       }
     } catch (e) {
       console.error("Error:", e);
@@ -159,7 +180,11 @@ const CompanyBids = () => {
   const visibleCompanyBids = companyBids.filter((b) => b.status !== "rejected");
 
   if (loading) {
-    return <div className="bids-container"><p>Loading bids...</p></div>;
+    return (
+      <div className="bids-container">
+        <p>Loading bids...</p>
+      </div>
+    );
   }
 
   return (
@@ -171,7 +196,11 @@ const CompanyBids = () => {
       {activeTab === "place-bid" && (
         <div className="bids-section bids-active">
           <div className="bids-grid">
-            <ProjectsList bids={bids} selectedBidId={selectedBid?._id} onSelect={selectBid} />
+            <ProjectsList
+              bids={bids}
+              selectedBidId={selectedBid?._id}
+              onSelect={selectBid}
+            />
             <ProjectDetails
               bid={selectedBid}
               bidAmount={bidAmount}

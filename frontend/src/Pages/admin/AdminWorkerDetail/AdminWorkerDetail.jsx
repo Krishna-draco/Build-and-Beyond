@@ -25,7 +25,7 @@ import "./AdminWorkerDetail.css";
 const getDocumentUrl = (path) => {
   if (!path) return "";
   if (path.startsWith("http")) return path;
-  return `http://localhost:3000${path.startsWith("/") ? "" : "/"}${path}`;
+  return `${window.__APP_API_BASE_URL__ || import.meta.env.VITE_API_BASE_URL || "http://localhost:3000"}${path.startsWith("/") ? "" : "/"}${path}`;
 };
 
 const formatCurrency = (value) =>
@@ -604,7 +604,9 @@ const AdminWorkerDetail = () => {
                         >
                           {project.invoiceOrCertificate && (
                             <a
-                              href={getDocumentUrl(project.invoiceOrCertificate)}
+                              href={getDocumentUrl(
+                                project.invoiceOrCertificate,
+                              )}
                               target="_blank"
                               rel="noreferrer"
                               className="worker360-file-link"

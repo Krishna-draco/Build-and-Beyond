@@ -24,7 +24,10 @@ import { useAdminAuth } from "../../../context/AdminAuthContext";
 import "../AdminCustomerDetail/AdminCustomerDetail.css";
 import "./AdminDesignRequestDetail.css";
 
-const BACKEND_BASE_URL = "http://localhost:3000";
+const BACKEND_BASE_URL =
+  window.__APP_API_BASE_URL__ ||
+  import.meta.env.VITE_API_BASE_URL ||
+  "http://localhost:3000";
 
 const formatCurrency = (value) =>
   `₹${Number(value || 0).toLocaleString("en-IN")}`;

@@ -26,9 +26,12 @@ const CompanyProjectRequests = () => {
   const fetchProjects = async () => {
     try {
       setLoading(true);
-      const res = await fetch("http://localhost:3000/api/project_requests", {
-        credentials: "include",
-      });
+      const res = await fetch(
+        `${window.__APP_API_BASE_URL__ || import.meta.env.VITE_API_BASE_URL || "http://localhost:3000"}/api/project_requests`,
+        {
+          credentials: "include",
+        },
+      );
       if (!res.ok) throw new Error("Failed to fetch project requests");
       const data = await res.json();
       setProjects(data.projects || []);
@@ -142,7 +145,7 @@ const CompanyProjectRequests = () => {
       };
 
       const res = await fetch(
-        "http://localhost:3000/api/company/submit-proposal",
+        `${window.__APP_API_BASE_URL__ || import.meta.env.VITE_API_BASE_URL || "http://localhost:3000"}/api/company/submit-proposal`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -172,7 +175,7 @@ const CompanyProjectRequests = () => {
 
     try {
       const res = await fetch(
-        `http://localhost:3000/api/projects/${projectId}/rejected`,
+        `${window.__APP_API_BASE_URL__ || import.meta.env.VITE_API_BASE_URL || "http://localhost:3000"}/api/projects/${projectId}/rejected`,
         {
           method: "PATCH",
           credentials: "include",

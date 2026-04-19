@@ -9,10 +9,13 @@ const CompanyEmployees = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("http://localhost:3000/api/my-employees", {
-      method: "GET",
-      credentials: "include"
-    })
+    fetch(
+      `${window.__APP_API_BASE_URL__ || import.meta.env.VITE_API_BASE_URL || "http://localhost:3000"}/api/my-employees`,
+      {
+        method: "GET",
+        credentials: "include",
+      },
+    )
       .then((res) => res.json())
       .then((data) => {
         setEmployees(data.employees || []);
@@ -25,7 +28,9 @@ const CompanyEmployees = () => {
     <div className="comEmp_container">
       <EmployeesHeader />
       <LoadingOrEmpty loading={loading} employeesLength={employees.length} />
-      {!loading && employees.length > 0 && <EmployeesGrid employees={employees} />}
+      {!loading && employees.length > 0 && (
+        <EmployeesGrid employees={employees} />
+      )}
     </div>
   );
 };

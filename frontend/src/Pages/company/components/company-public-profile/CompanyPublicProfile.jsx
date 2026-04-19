@@ -19,9 +19,12 @@ const CompanyPublicProfile = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch("http://localhost:3000/api/companysettings", {
-        credentials: "include"
-      });
+      const response = await fetch(
+        `${window.__APP_API_BASE_URL__ || import.meta.env.VITE_API_BASE_URL || "http://localhost:3000"}/api/companysettings`,
+        {
+          credentials: "include",
+        },
+      );
 
       if (!response.ok) {
         throw new Error(`Failed to fetch company profile: ${response.status}`);
@@ -65,7 +68,8 @@ const CompanyPublicProfile = () => {
     return (
       <div className="profile-container">
         <div className="profile-no-data">
-          <i className="fas fa-info-circle"></i> No company profile data available.
+          <i className="fas fa-info-circle"></i> No company profile data
+          available.
         </div>
       </div>
     );
@@ -75,9 +79,9 @@ const CompanyPublicProfile = () => {
     <div className="profile-container">
       <ProfileHeader company={companyData} />
       <div className="profile-content">
-        <AboutSection 
-          about={companyData.about} 
-          didYouKnow={companyData.didYouKnow} 
+        <AboutSection
+          about={companyData.about}
+          didYouKnow={companyData.didYouKnow}
         />
         <Specializations specializations={companyData.specializations} />
         <TeamMembers teamMembers={companyData.teamMembers} />

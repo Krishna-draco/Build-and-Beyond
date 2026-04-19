@@ -6,8 +6,8 @@ import ProfileSection from "./components/ProfileSection";
 import SecuritySection from "./components/SecuritySection";
 import HelpSection from "./components/HelpSection";
 
-const API_GET = "http://localhost:3000/api/companysettings";
-const API_POST_UPDATE = "http://localhost:3000/api/update-company-profile";
+const API_GET = `${window.__APP_API_BASE_URL__ || import.meta.env.VITE_API_BASE_URL || "http://localhost:3000"}/api/companysettings`;
+const API_POST_UPDATE = `${window.__APP_API_BASE_URL__ || import.meta.env.VITE_API_BASE_URL || "http://localhost:3000"}/api/update-company-profile`;
 
 export default function CompanySettings() {
   const [loading, setLoading] = useState(true);
@@ -20,7 +20,7 @@ export default function CompanySettings() {
       specializations: [],
       currentOpenings: [],
       about: "",
-      whyJoin: ""
+      whyJoin: "",
     },
     customerProfile: {
       name: "",
@@ -29,8 +29,8 @@ export default function CompanySettings() {
       yearsInBusiness: 0,
       about: "",
       didYouKnow: "",
-      completedProjects: []
-    }
+      completedProjects: [],
+    },
   });
 
   const [activeSection, setActiveSection] = useState("profile");
@@ -47,7 +47,7 @@ export default function CompanySettings() {
     specializations: "",
     currentOpenings: [],
     aboutCompany: "",
-    whyJoinUs: ""
+    whyJoinUs: "",
   });
 
   // Customer form refs/controlled + file inputs
@@ -59,7 +59,7 @@ export default function CompanySettings() {
     customerAboutCompany: "",
     didYouKnow: "",
     // completedProjects will be array of objects with title, description, image, location, tenderId, materialCertificate, gpsLink
-    completedProjects: []
+    completedProjects: [],
   });
   // we will store file inputs in refs so we can append them to FormData conditionally
   const projectFileInputs = useRef([]);
@@ -75,11 +75,13 @@ export default function CompanySettings() {
     setError(null);
     try {
       const res = await fetch(API_GET, {
-        credentials: "include"
+        credentials: "include",
       });
       if (!res.ok) {
         const txt = await res.text();
-        throw new Error(`Failed to fetch settings. ${res.status} ${res.statusText} ${txt}`);
+        throw new Error(
+          `Failed to fetch settings. ${res.status} ${res.statusText} ${txt}`,
+        );
       }
       const payload = await res.json();
       if (!payload || !payload.company) {
@@ -93,10 +95,11 @@ export default function CompanySettings() {
         companyName: w.name || "",
         companyLocation: w.location || "",
         companySize: w.size || "",
-        specializations: (w.specializations && w.specializations.join(", ")) || "",
+        specializations:
+          (w.specializations && w.specializations.join(", ")) || "",
         currentOpenings: w.currentOpenings ? [...w.currentOpenings] : [],
         aboutCompany: w.about || "",
-        whyJoinUs: w.whyJoin || ""
+        whyJoinUs: w.whyJoin || "",
       });
 
       const c = payload.company.customerProfile || {};
@@ -107,11 +110,17 @@ export default function CompanySettings() {
         yearsInBusiness: c.yearsInBusiness || 0,
         customerAboutCompany: c.about || "",
         didYouKnow: c.didYouKnow || "",
-        completedProjects: c.completedProjects && c.completedProjects.length ? c.completedProjects.map(p => ({ ...p })) : []
+        completedProjects:
+          c.completedProjects && c.completedProjects.length
+            ? c.completedProjects.map((p) => ({ ...p }))
+            : [],
       });
 
       // reset file inputs refs
-      projectFileInputs.current = c.completedProjects && c.completedProjects.length ? c.completedProjects.map(() => ({ before: null, after: null })) : [];
+      projectFileInputs.current =
+        c.completedProjects && c.completedProjects.length
+          ? c.completedProjects.map(() => ({ before: null, after: null }))
+          : [];
       certificateFileInputs.current = [];
     } catch (err) {
       console.error("Fetch error", err);
@@ -124,21 +133,24 @@ export default function CompanySettings() {
   // Worker form handlers
   function handleWorkerChange(e) {
     const { name, value } = e.target;
-    setWorkerForm(prev => ({ ...prev, [name]: value }));
+    setWorkerForm((prev) => ({ ...prev, [name]: value }));
   }
 
   function addOpening() {
-    setWorkerForm(prev => ({ ...prev, currentOpenings: [...prev.currentOpenings, ""] }));
+    setWorkerForm((prev) => ({
+      ...prev,
+      currentOpenings: [...prev.currentOpenings, ""],
+    }));
   }
   function updateOpening(idx, value) {
-    setWorkerForm(prev => {
+    setWorkerForm((prev) => {
       const arr = [...prev.currentOpenings];
       arr[idx] = value;
       return { ...prev, currentOpenings: arr };
     });
   }
   function removeOpening(idx) {
-    setWorkerForm(prev => {
+    setWorkerForm((prev) => {
       const arr = prev.currentOpenings.filter((_, i) => i !== idx);
       return { ...prev, currentOpenings: arr };
     });
@@ -164,7 +176,7 @@ export default function CompanySettings() {
         specializations: workerForm.specializations,
         aboutCompany: workerForm.aboutCompany,
         whyJoinUs: workerForm.whyJoinUs,
-        currentOpenings: workerForm.currentOpenings
+        currentOpenings: workerForm.currentOpenings,
       };
 
       const res = await fetch(API_POST_UPDATE, {
@@ -172,13 +184,14 @@ export default function CompanySettings() {
         credentials: "include",
         headers: {
           // Do not set Content-Type because we are sending JSON here
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Failed to update worker profile.");
+      if (!res.ok)
+        throw new Error(data.message || "Failed to update worker profile.");
 
       // reload fresh data
       await fetchCompany();
@@ -193,23 +206,40 @@ export default function CompanySettings() {
   // Customer handlers (FormData because files may be included)
   function handleCustomerChange(e) {
     const { name, value } = e.target;
-    setCustomerForm(prev => ({ ...prev, [name]: value }));
+    setCustomerForm((prev) => ({ ...prev, [name]: value }));
   }
 
   // completed project items management
   function addProject() {
-    setCustomerForm(prev => ({ ...prev, completedProjects: [...prev.completedProjects, { title: "", description: "", beforeImage: "", afterImage: "", location: "", tenderId: "", materialCertificate: "", gpsLink: "" }] }));
+    setCustomerForm((prev) => ({
+      ...prev,
+      completedProjects: [
+        ...prev.completedProjects,
+        {
+          title: "",
+          description: "",
+          beforeImage: "",
+          afterImage: "",
+          location: "",
+          tenderId: "",
+          materialCertificate: "",
+          gpsLink: "",
+        },
+      ],
+    }));
     projectFileInputs.current.push({ before: null, after: null });
     certificateFileInputs.current.push(null);
   }
   function updateProject(idx, key, value) {
-    setCustomerForm(prev => {
-      const arr = prev.completedProjects.map((p, i) => (i === idx ? { ...p, [key]: value } : p));
+    setCustomerForm((prev) => {
+      const arr = prev.completedProjects.map((p, i) =>
+        i === idx ? { ...p, [key]: value } : p,
+      );
       return { ...prev, completedProjects: arr };
     });
   }
   function removeProject(idx) {
-    setCustomerForm(prev => {
+    setCustomerForm((prev) => {
       const arr = prev.completedProjects.filter((_, i) => i !== idx);
       projectFileInputs.current.splice(idx, 1);
       certificateFileInputs.current.splice(idx, 1);
@@ -219,7 +249,8 @@ export default function CompanySettings() {
 
   function handleBeforeImageChange(e, idx) {
     const file = e.target.files[0];
-    if (!projectFileInputs.current[idx]) projectFileInputs.current[idx] = { before: null, after: null };
+    if (!projectFileInputs.current[idx])
+      projectFileInputs.current[idx] = { before: null, after: null };
     projectFileInputs.current[idx].before = file || null;
 
     if (file) {
@@ -233,7 +264,8 @@ export default function CompanySettings() {
 
   function handleAfterImageChange(e, idx) {
     const file = e.target.files[0];
-    if (!projectFileInputs.current[idx]) projectFileInputs.current[idx] = { before: null, after: null };
+    if (!projectFileInputs.current[idx])
+      projectFileInputs.current[idx] = { before: null, after: null };
     projectFileInputs.current[idx].after = file || null;
 
     if (file) {
@@ -261,7 +293,10 @@ export default function CompanySettings() {
   async function submitCustomerProfile(e) {
     e.preventDefault();
     // Basic validations
-    if (!customerForm.customerCompanyLocation && !customerForm.companyLocation) {
+    if (
+      !customerForm.customerCompanyLocation &&
+      !customerForm.companyLocation
+    ) {
       // allow companyLocation field name difference
       // earlier set companyLocation vs customerCompanyLocation
     }
@@ -284,22 +319,34 @@ export default function CompanySettings() {
       location: p.location || "",
       tenderId: p.tenderId || "",
       materialCertificate: p.materialCertificate || "",
-      gpsLink: p.gpsLink || ""
+      gpsLink: p.gpsLink || "",
     }));
     fd.append("completedProjects", JSON.stringify(projectsPayload));
-    
+
     projectFileInputs.current.forEach((files, idx) => {
       if (files && files.before) {
-        fd.append("projectBeforeImages", files.before, `project_before_${idx}.${files.before.name.split('.').pop()}`);
+        fd.append(
+          "projectBeforeImages",
+          files.before,
+          `project_before_${idx}.${files.before.name.split(".").pop()}`,
+        );
       }
       if (files && files.after) {
-        fd.append("projectAfterImages", files.after, `project_after_${idx}.${files.after.name.split('.').pop()}`);
+        fd.append(
+          "projectAfterImages",
+          files.after,
+          `project_after_${idx}.${files.after.name.split(".").pop()}`,
+        );
       }
     });
-    
+
     certificateFileInputs.current.forEach((file, idx) => {
       if (file) {
-        fd.append("certificateFiles", file, `certificate_${idx}.${file.name.split('.').pop()}`);
+        fd.append(
+          "certificateFiles",
+          file,
+          `certificate_${idx}.${file.name.split(".").pop()}`,
+        );
       }
     });
 
@@ -308,7 +355,7 @@ export default function CompanySettings() {
         method: "POST",
         credentials: "include",
         // DO NOT set Content-Type; browser will set multipart boundary
-        body: fd
+        body: fd,
       });
 
       const contentType = res.headers.get("content-type") || "";
@@ -341,7 +388,9 @@ export default function CompanySettings() {
     return (
       <div className="cs-error">
         <p>Error loading settings: {error}</p>
-        <button className="cs-btn-primary" onClick={fetchCompany}>Retry</button>
+        <button className="cs-btn-primary" onClick={fetchCompany}>
+          Retry
+        </button>
       </div>
     );
   }
@@ -351,7 +400,9 @@ export default function CompanySettings() {
       <div className="cs-inner">
         <header className="cs-header">
           <h1 className="cs-title">Company Settings</h1>
-          <p className="cs-subtitle">Manage your company profile and settings</p>
+          <p className="cs-subtitle">
+            Manage your company profile and settings
+          </p>
         </header>
 
         <div className="cs-grid">

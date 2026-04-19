@@ -51,7 +51,7 @@ const CompanyOngoing = () => {
     try {
       setLoading(true);
       const res = await fetch(
-        "http://localhost:3000/api/companyongoing_projects",
+        `${window.__APP_API_BASE_URL__ || import.meta.env.VITE_API_BASE_URL || "http://localhost:3000"}/api/companyongoing_projects`,
         {
           credentials: "include",
         },
@@ -64,7 +64,7 @@ const CompanyOngoing = () => {
       // Fetch unviewed complaints count (from customers)
       try {
         const complaintsRes = await fetch(
-          "http://localhost:3000/api/company/unviewed-customer-messages",
+          `${window.__APP_API_BASE_URL__ || import.meta.env.VITE_API_BASE_URL || "http://localhost:3000"}/api/company/unviewed-customer-messages`,
           {
             credentials: "include",
           },
@@ -137,7 +137,7 @@ const CompanyOngoing = () => {
 
       try {
         await fetch(
-          `http://localhost:3000/api/company/mark-messages-viewed/${id}`,
+          `${window.__APP_API_BASE_URL__ || import.meta.env.VITE_API_BASE_URL || "http://localhost:3000"}/api/company/mark-messages-viewed/${id}`,
           {
             method: "POST",
             credentials: "include",
