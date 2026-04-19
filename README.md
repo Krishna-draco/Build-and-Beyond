@@ -1,4 +1,4 @@
-# Build and Beyond
+# Build and Beyond 
 
 Build and Beyond is a full‑stack platform that connects customers with construction companies and specialized workers (Architects and Interior Designers). It supports project posting, bidding, hiring, milestone tracking, real‑time chat, reviews, and admin moderation.
 
